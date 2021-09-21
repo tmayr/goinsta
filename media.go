@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	neturl "net/url"
 	"os"
 	"path"
 	"regexp"
@@ -507,56 +506,6 @@ func (item *Item) Unsave() error {
 //
 // This function does not download CarouselMedia.
 //
-// See example: examples/media/itemDownload.go
-func (item *Item) Download(folder, name string) (imgs, vds string, err error) {
-	var u *neturl.URL
-	var nname string
-	imgFolder := path.Join(folder, "images")
-	vidFolder := path.Join(folder, "videos")
-	inst := item.media.instagram()
-
-	os.MkdirAll(folder, 0777)
-	os.MkdirAll(imgFolder, 0777)
-	os.MkdirAll(vidFolder, 0777)
-
-	vds = GetBest(item.Videos)
-	if vds != "" {
-		if name == "" {
-			u, err = neturl.Parse(vds)
-			if err != nil {
-				return
-			}
-
-			nname = path.Join(vidFolder, path.Base(u.Path))
-		} else {
-			nname = path.Join(vidFolder, name)
-		}
-		nname = getname(nname)
-
-		vds, err = download(inst, vds, nname)
-		return "", vds, err
-	}
-
-	imgs = GetBest(item.Images.Versions)
-	if imgs != "" {
-		if name == "" {
-			u, err = neturl.Parse(imgs)
-			if err != nil {
-				return
-			}
-
-			nname = path.Join(imgFolder, path.Base(u.Path))
-		} else {
-			nname = path.Join(imgFolder, name)
-		}
-		nname = getname(nname)
-
-		imgs, err = download(inst, imgs, nname)
-		return imgs, "", err
-	}
-
-	return imgs, vds, fmt.Errorf("cannot find any image or video")
-}
 
 // TopLikers returns string slice or single string (inside string slice)
 // Depending on TopLikers parameter.
